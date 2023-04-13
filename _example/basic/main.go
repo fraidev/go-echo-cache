@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/coocood/freecache"
-	cache "github.com/gitsight/go-echo-cache"
+	cache "github.com/fraidev/go-echo-cache"
 	"github.com/labstack/echo/v4"
 )
 

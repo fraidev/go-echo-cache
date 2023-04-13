@@ -22,6 +22,12 @@ func NewResponseRecorder(w http.ResponseWriter) *ResponseRecorder {
 	}
 }
 
+func (w *ResponseRecorder) Flush() {
+	if f, ok := w.ResponseWriter.(http.Flusher); ok {
+		f.Flush()
+	}
+}
+
 func (w *ResponseRecorder) Write(b []byte) (int, error) {
 	w.copyHeaders()
 	i, err := w.ResponseWriter.Write(b)

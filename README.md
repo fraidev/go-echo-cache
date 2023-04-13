@@ -1,4 +1,4 @@
-# go-echo-cache [![GoDoc](https://godoc.org/github.com/gitsight/go-echo-cache?status.svg)](https://pkg.go.dev/github.com/gitsight/go-echo-cache) [![Test](https://github.com/gitsight/go-echo-cache/workflows/Test/badge.svg)](https://github.com/gitsight/go-echo-cache/actions?query=workflow%3ATest+branch%3Amaster) 
+# go-echo-cache [![GoDoc](https://godoc.org/github.com/fraidev/go-echo-cache?status.svg)](https://pkg.go.dev/github.com/fraidev/go-echo-cache) [![Test](https://github.com/fraidev/go-echo-cache/workflows/Test/badge.svg)](https://github.com/fraidev/go-echo-cache/actions?query=workflow%3ATest+branch%3Amaster) 
 
 *go-echo-cache*, is a server-side HTTP cache middleware designed to work with [Echo framework](https://echo.labstack.com/).
 
@@ -10,7 +10,7 @@ Installation
 The recommended way to install *go-echo-cache* is:
 
 ```go
-go get -u github.com/gitsight/go-echo-cache     
+go get -u github.com/fraidev/go-echo-cache     
 ```
 
 
@@ -29,7 +29,7 @@ import (
 	"time"
 
 	"github.com/coocood/freecache"
-	cache "github.com/gitsight/go-echo-cache"
+	cache "github.com/fraidev/go-echo-cache"
 	"github.com/labstack/echo/v4"
 )
 

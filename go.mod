@@ -1,4 +1,4 @@
-module github.com/gitsight/go-echo-cache
+module github.com/fraidev/go-echo-cache
 
 go 1.16
 
