@@ -26,6 +26,8 @@ type Config struct {
 	// Cache fuction called before cache a request, if false, the request is not
 	// cached. If set Method is ignored.
 	Cache func(r *http.Request) bool
+	// GetKey function called to generate the key for the cache.
+	GetKey func(r *http.Request) []byte
 }
 
 func New(cfg *Config, cache *freecache.Cache) echo.MiddlewareFunc {
@@ -132,6 +134,10 @@ func (m *CacheMiddleware) isCacheable(r *http.Request) bool {
 }
 
 func (m *CacheMiddleware) getKey(r *http.Request) []byte {
+	if m.cfg.GetKey != nil {
+		return m.cfg.GetKey(r)
+	}
+
 	base := r.Method + "|" + r.URL.Path
 	if !m.cfg.IgnoreQuery {
 		base += "|" + r.URL.Query().Encode()
