@@ -17,14 +17,12 @@ func NewRedisCache(cache *redis.Client) RedisCache {
 	}
 }
 
-func (c *RedisCache) Get(key []byte) (value []byte, err error) {
-	ctx := context.Background()
+func (c *RedisCache) Get(ctx context.Context, key []byte) (value []byte, err error) {
 	val, err := c.cache.Get(ctx, string(key)).Bytes()
 	return val, err
 }
 
-func (c *RedisCache) Set(key, value []byte, expireSeconds int) (err error) {
-	ctx := context.Background()
+func (c *RedisCache) Set(ctx context.Context, key, value []byte, expireSeconds int) (err error) {
 	expiration := time.Duration(expireSeconds) * time.Second
 	err = c.cache.Set(ctx, string(key), value, expiration).Err()
 	return err

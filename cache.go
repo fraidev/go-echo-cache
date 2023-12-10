@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -8,12 +9,13 @@ import (
 	"github.com/coocood/freecache"
 	"github.com/labstack/echo/v4"
 	"github.com/mcuadros/go-defaults"
+	"github.com/redis/go-redis/v9"
 )
 
 // Cache defines the interface for a cache.
 type Cache interface {
-	Get(key []byte) (value []byte, err error)
-	Set(key, value []byte, expireSeconds int) (err error)
+	Get(ctx context.Context, key []byte) (value []byte, err error)
+	Set(ctx context.Context, key, value []byte, expireSeconds int) (err error)
 }
 
 // Config defiens the configuration for a cache middleware.
@@ -67,7 +69,7 @@ func (m *CacheMiddleware) Handler(next echo.HandlerFunc) echo.HandlerFunc {
 			return nil
 		}
 
-		if err != freecache.ErrNotFound {
+		if err != freecache.ErrNotFound && err != redis.Nil {
 			c.Logger().Errorf("error reading cache: %s", err)
 		}
 
@@ -75,7 +77,7 @@ func (m *CacheMiddleware) Handler(next echo.HandlerFunc) echo.HandlerFunc {
 		c.Response().Writer = recorder
 
 		err = next(c)
-		if err := m.cacheResult(key, recorder); err != nil {
+		if err := m.cacheResult(c.Request().Context(), key, recorder); err != nil {
 			c.Logger().Error(err)
 		}
 
@@ -84,11 +86,12 @@ func (m *CacheMiddleware) Handler(next echo.HandlerFunc) echo.HandlerFunc {
 }
 
 func (m *CacheMiddleware) readCache(key []byte, c echo.Context) error {
-	if m.cfg.Refresh != nil && m.cfg.Refresh(c.Request()) {
+	req := c.Request()
+	if m.cfg.Refresh != nil && m.cfg.Refresh(req) {
 		return freecache.ErrNotFound
 	}
 
-	value, err := m.cache.Get(key)
+	value, err := m.cache.Get(req.Context(), key)
 	if err != nil {
 		return err
 	}
@@ -101,7 +104,7 @@ func (m *CacheMiddleware) readCache(key []byte, c echo.Context) error {
 	return entry.Replay(c.Response())
 }
 
-func (m *CacheMiddleware) cacheResult(key []byte, r *ResponseRecorder) error {
+func (m *CacheMiddleware) cacheResult(ctx context.Context, key []byte, r *ResponseRecorder) error {
 	e := r.Result()
 	b, err := e.Encode()
 	if err != nil {
@@ -112,7 +115,7 @@ func (m *CacheMiddleware) cacheResult(key []byte, r *ResponseRecorder) error {
 		return nil
 	}
 
-	return m.cache.Set(key, b, int(m.cfg.TTL.Seconds()))
+	return m.cache.Set(ctx, key, b, int(m.cfg.TTL.Seconds()))
 }
 
 func (m *CacheMiddleware) isStatusCacheable(e *CacheEntry) bool {
