@@ -157,7 +157,9 @@ func getCachedServerWithCode(t *testing.T, cfg *Config, status int) *httptest.Se
 	e := echo.New()
 
 	var i int
-	h := New(cfg, freecache.NewCache(42*1024*1024))(func(c echo.Context) error {
+	freecache := freecache.NewCache(42 * 1024 * 1024)
+	cache := NewMemoryCache(freecache)
+	h := New(cfg, &cache)(func(c echo.Context) error {
 		i++
 		return c.String(status, fmt.Sprintf("test_%d", i))
 	})

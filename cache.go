@@ -10,6 +10,12 @@ import (
 	"github.com/mcuadros/go-defaults"
 )
 
+// Cache defines the interface for a cache.
+type Cache interface {
+	Get(key []byte) (value []byte, err error)
+	Set(key, value []byte, expireSeconds int) (err error)
+}
+
 // Config defiens the configuration for a cache middleware.
 type Config struct {
 	// TTL time to life of the cache.
@@ -30,7 +36,7 @@ type Config struct {
 	GetKey func(r *http.Request) []byte
 }
 
-func New(cfg *Config, cache *freecache.Cache) echo.MiddlewareFunc {
+func New(cfg *Config, cache Cache) echo.MiddlewareFunc {
 	if cfg == nil {
 		cfg = &Config{}
 	}
@@ -42,7 +48,7 @@ func New(cfg *Config, cache *freecache.Cache) echo.MiddlewareFunc {
 
 type CacheMiddleware struct {
 	cfg   *Config
-	cache *freecache.Cache
+	cache Cache
 }
 
 func (m *CacheMiddleware) Handler(next echo.HandlerFunc) echo.HandlerFunc {
