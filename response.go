@@ -38,7 +38,7 @@ func (w *ResponseRecorder) Write(b []byte) (int, error) {
 	return w.body.Write(b[:i])
 }
 
-func (r ResponseRecorder) copyHeaders() {
+func (r *ResponseRecorder) copyHeaders() {
 	if r.headerCopied {
 		return
 	}
